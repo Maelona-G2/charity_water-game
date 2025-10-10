@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basic HTML Page</title>
+</head>
+<body>
+  <link rel="stylesheet" href="style.css">
+<!--Navigation Bar-->
+<nav class="nav-container" id="navbar">
+  <img src="img/thespring.png" alt="charitywaterlogo" id="navlogo" width="175" height="90">
+</nav>
+
+<!-- Main Content Containers -->
+<div class="container" id="intro-container">
+  <div id="page1">
+    <h1>Welcome to Carry the Jerry!</h1>
+    <h2>How To Play</h2>
+    <p>Carry the jerry cans past 3 levels to win the game.</p>
+    <div class="button-group">
+      <button onclick="startgame">New Game</button>
+      <button onclick="restartgame">Restart Game</button>
+      <button onclick="showabout">More</button>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="game-container">
+  <div id="gamepage">
+    <nav class="game-navbar">
+      <ul>
+        <li>Level</li>
+        <li>Timer</li>
+        <li>Home</li>
+      </ul>
+    </nav>
+    <div id="gamearea" class="gamecontainer">
+      <div id="player"></div>
+      <div id="checkpoint1" class="checkpoint"></div>
+      <div id="checkpoint2" class="checkpoint"></div>
+      <div id="checkpoint3" class="checkpoint"></div>
+      <div id="obstacle1" class="obstacle"></div>
+      <div id="obstacle2" class="obstacle"></div>
+      <div id="obstacle3" class="obstacle"></div>
+    </div>
+  </div>
+</div>
+  <footer>
+    <p>&copy; 2025 Your Name. All rights reserved.</p>
+  </footer>
+</body>
+</html>
