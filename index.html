@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Basic HTML Page</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <link rel="stylesheet" href="style.css">
+
 <!--Navigation Bar-->
 <nav class="nav-container" id="navbar">
   <img src="img/thespring.png" alt="charitywaterlogo" id="navlogo" width="175" height="90">
@@ -33,11 +34,9 @@
 <div class="container" id="game-container">
   <div id="gamepage">
     <nav class="game-navbar">
-      <ul>
-        <li>Level</li>
-        <li>Timer</li>
-        <li>Home</li>
-      </ul>
+      <h2>Scoreboard</h2>
+        <p>Level: <span id="level">1</span></p>
+        <p>Time: <span id="time">00:00</span></p>
     </nav>
     <div id="gamearea" class="gamecontainer">
       <div id="player"></div>
@@ -49,14 +48,18 @@
       <div id="obstacle3" class="obstacle"></div>
     </div>
     <div id="gameboard">
-      <h2>Scoreboard</h2>
-      <p>Level: <span id="level">1</span></p>
-      <p>Time: <span id="time">00:00</span></p>
       <p>Checkpoints Reached: <span id="checkpoints">0/3</span></p>
       <div class="tile start"></div>
       <div class="tile path"></div>
       <div class="tile blocked"></div>
     </div> 
+    <div id="gameover" class="overlay">
+      <div class="overlay-content">
+        <h2>Game Over!</h2>
+        <p>Your final score: <span id="final-score">0</span></p>
+        <button onclick="restartgame()">Restart Game</button>
+        <button onclick="showintro()">Main Menu</button>      
+    </div>
 
     </div>
   </div>
