@@ -4,9 +4,9 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
+    width: 100%;
     max-width: 100vw;
-    background: #2967c3;
+    background: #e2e06ecb;
     display: flex;
     align-items: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -24,6 +24,14 @@
     margin-left: 0;
     display: block;
 }
+#navbar ul {
+    list-style: none;
+    display: flex;
+    justify-content: flect-end;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+}
 h1 {
     text-align: center;
     padding: 2rem
@@ -39,7 +47,7 @@ body {
     padding: 1rem;
     text-align: center;
     font-family: Arial, sans-serif;
-    background-color: aqua;
+    background-color: rgba(243, 247, 247, 0.8);
     margin-bottom: 2rem
 }
 .button-group {
@@ -49,22 +57,42 @@ body {
     padding: 0;
     list-style-type: disc;
 }
+
 /* second page */
 #game-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
     font-family: Arial, sans-serif;
-    background-color: rgb(191, 223, 223);
+    background-color: rgba(233, 238, 238, 0.815);
+    overflow: visible;
 }
 .game-navbar {
     display: flex;
     justify-content: center;
-    gap: 2rem;
     background-color: #2967c3;
     color: white;
-    margin-bottom: 2rem;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
-
+.game-navbar ul {
+    margin: 0;
+    padding: 0.5rem 1rem 0 1rem;
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+}
+#gameboard {
+    display: grid;
+    grid-template-columns: repeat(10, 50px);
+    grid-template-rows: repeat(10, 50px);
+    gap: 2px;
+    background-image: url('img/board.jpg');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    width: 600px;
+    height: 600px;
+}
     

@@ -10,6 +10,10 @@
 <!--Navigation Bar-->
 <nav class="nav-container" id="navbar">
   <img src="img/thespring.png" alt="charitywaterlogo" id="navlogo" width="175" height="90">
+  <ul class="nav-links">
+    <li>Charity: water</li>
+    <li>Donate Today!</li>
+    <li>About Us</li>
 </nav>
 
 <!-- Main Content Containers -->
@@ -44,10 +48,23 @@
       <div id="obstacle2" class="obstacle"></div>
       <div id="obstacle3" class="obstacle"></div>
     </div>
+    <div id="gameboard">
+      <h2>Scoreboard</h2>
+      <p>Level: <span id="level">1</span></p>
+      <p>Time: <span id="time">00:00</span></p>
+      <p>Checkpoints Reached: <span id="checkpoints">0/3</span></p>
+      <div class="tile start"></div>
+      <div class="tile path"></div>
+      <div class="tile blocked"></div>
+    </div> 
+
+    </div>
   </div>
 </div>
+
   <footer>
     <p>&copy; 2025 Your Name. All rights reserved.</p>
   </footer>
+  <script src="javascript.js"></script>
 </body>
 </html>
