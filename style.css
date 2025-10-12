@@ -94,6 +94,7 @@ body {
     background-repeat: no-repeat;
     width: 600px;
     height: 600px;
+    position: relative;
 }
 #player {
     width: 40px;

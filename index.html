@@ -15,6 +15,7 @@
     <li>Charity: water</li>
     <li>Donate Today!</li>
     <li>About Us</li>
+  </ul>  
 </nav>
 
 <!-- Main Content Containers -->
@@ -24,13 +25,14 @@
     <h2>How To Play</h2>
     <p>Carry the jerry cans past 3 levels to win the game.</p>
     <div class="button-group">
-      <button onclick="startgame">New Game</button>
-      <button onclick="restartgame">Restart Game</button>
-      <button onclick="showabout">More</button>
+      <button onclick="startgame()">New Game</button>
+      <button onclick="restartgame()">Restart Game</button>
+      <button onclick="showabout()">More</button>
     </div>
   </div>
 </div>
 
+<!-- game container -->
 <div class="container" id="game-container">
   <div id="gamepage">
     <nav class="game-navbar">
@@ -38,8 +40,7 @@
         <p>Level: <span id="level">1</span></p>
         <p>Time: <span id="time">00:00</span></p>
     </nav>
-    <div id="gamearea" class="gamecontainer">
-      <div id="player"></div>
+    <div id="gamearea">
       <div id="checkpoint1" class="checkpoint"></div>
       <div id="checkpoint2" class="checkpoint"></div>
       <div id="checkpoint3" class="checkpoint"></div>
@@ -48,17 +49,20 @@
       <div id="obstacle3" class="obstacle"></div>
     </div>
     <div id="gameboard">
+      <div id="player"></div>
       <p>Checkpoints Reached: <span id="checkpoints">0/3</span></p>
       <div class="tile start"></div>
       <div class="tile path"></div>
       <div class="tile blocked"></div>
-    </div> 
+    </div>
+
     <div id="gameover" class="overlay">
       <div class="overlay-content">
         <h2>Game Over!</h2>
         <p>Your final score: <span id="final-score">0</span></p>
         <button onclick="restartgame()">Restart Game</button>
-        <button onclick="showintro()">Main Menu</button>      
+        <button onclick="showintro()">Main Menu</button>
+      </div>     
     </div>
 
     </div>
