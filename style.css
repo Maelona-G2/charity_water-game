@@ -1,12 +1,10 @@
-/* Navbar fixed at top, full width but not overflowing, with padding and background */
-/*first page */
 #navbar {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     max-width: 100vw;
-    background: #e2e06ecb;
+    background: white;
     display: flex;
     align-items: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
@@ -16,6 +14,7 @@
     overflow-x: hidden;
     margin-bottom: 4rem;
     flex-wrap: wrap;
+    font-family: playfair display, serif;
 }
 #navlogo {
     height: 2.5rem;
@@ -24,7 +23,6 @@
     margin-right: 1.5rem;
     margin-left: 0;
     display: block;
-    max-width: 20vw;
 }
 #navbar ul {
     list-style: none;
@@ -33,38 +31,60 @@
     gap: 1.5rem;
     margin: 0;
     padding: 0;
-    align-items: center;
+    align-items: right;
     flex-wrap: wrap;
+    text-decoration: none;
+    color: inherit;
 }
 h1 {
     text-align: center;
-    padding: 2rem 1rem 1rem 1rem;
+    padding: 2rem;
     margin: 2px;
     font-size: 2.2rem;
+    font-family: playfair display, serif;
+}
+p {
+    text-align: center;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin: 0 0 1rem 0;
+    font-family: playfair display, serif;
+    padding: 0 2rem;
 }
 body {
     padding-top: 6rem;
     color: #333;
-    background-color:cornflowerblue;
+    background-color: #BF6C46;
     margin: 0;
     font-size: 1rem;
+    font-family: Playfair Display, serif;
 }
 #intro-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 1rem;
     text-align: center;
-    font-family: Arial, sans-serif;
+    font-family: playfair display, serif;
     background-color: rgba(243, 247, 247, 0.8);
     margin-bottom: 2rem;
     width: 95vw;
     box-sizing: border-box;
 }
+.entername {
+    text-align: center;
+    font-family: playfair display, serif;
+    margin-bottom: 1rem;
+    padding: 3rem;
+}
+/* allow fade on form */
+#username-form, .entername {
+    transition: opacity 0.6s ease;
+}
 .container {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 95vw;
-    max-width: 900px;
+    width: 100vw;
+    max-width: 1000px;
     margin: 0 auto 2rem auto;
     box-sizing: border-box;
 }
@@ -75,8 +95,54 @@ body {
     padding: 0;
     list-style-type: disc;
 }
-
+/* Transitions for welcome -> greeting -> instructions */
+#welcome {
+    transition: opacity 0.2s ease;
+}
+/* greeting and instructions start hidden via visibility + opacity */
+#greeting-message,
+#instructions-section {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.visible {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+}
 /* second page */
+#instructions-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+    text-align: center;
+    font-family: playfair display, serif;
+    margin-bottom: 2rem;
+    width: 95vw;
+    box-sizing: border-box;
+}
+.instructions-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 auto 1rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.instructions-list li {
+    padding: 0.25rem 0;
+    text-align: center;
+}
+
+.scoreboard .checkpoints {
+    margin-top: 0.25rem;
+}
 #game-container {
     display: flex;
     flex-direction: column;
@@ -85,8 +151,11 @@ body {
     text-align: center;
     font-family: Arial, sans-serif;
     background-color: rgba(233, 238, 238, 0.815);
-    overflow: visible;
+    overflow: hidden;
     width: 100%;
+    max-width: 900px;
+    box-sizing: border-box;
+    padding: 1rem;
     box-sizing: border-box;
 }
 .game-navbar {
@@ -113,14 +182,15 @@ body {
     background-image: url('img/board.jpg');
     background-size: cover;
     background-repeat: no-repeat;
-    width: 95vw;
-    max-width: 600px;
-    height: 60vw;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
     max-height: 600px;
     position: relative;
-    justify-content: center;
     margin: 0 auto;
     box-sizing: border-box;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
 }
 #player {
     width: 8vw;
@@ -153,7 +223,10 @@ body {
         z-index: 2000;
         display: none;
 }
-
+.no-bullets {
+    list-style: none;
+    padding-left: 0;
+}
 @media (max-width: 700px) {
     #navbar {
         height: 3rem;
@@ -168,10 +241,11 @@ body {
         padding: 1rem 0.5rem 0.5rem 0.5rem;
     }
     #gameboard {
-        max-width: 98vw;
-        max-height: 60vw;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        height: auto;
         min-width: 220px;
-        min-height: 180px;
+        box-sizing: border-box;
     }
     #player {
         max-width: 28px;
