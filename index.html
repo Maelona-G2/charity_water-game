@@ -18,7 +18,6 @@
       <li><a href="https://www.charitywater.org/our-work?_gl=1*vn05x0*_up*MQ..*_gs*MQ..&gclid=CjwKCAjw0sfHBhB6EiwAQtv5qfGHjK5zL0T6eAeKTfuBHyfsaapEfyqUrRnc_jGk3DCXzTHhCxutTBoCbWQQAvD_BwE&gbraid=0AAAAADNj5D9TT2-6yvaNkI4rEXObjOJCx">About Us</a></li>
     </ul>  
   </nav>
-
   <div class="container" id="intro-container">
     <div id="welcome">
       <h1 id="header">Welcome to Carry the Jerry!</h1>
@@ -90,8 +89,21 @@
       </div>     
     </div>
   </div>
+  <!-- Obstacle matching modal -->
+  <div id="obstacle-modal" class="overlay" style="display:none;">
+    <div class="overlay-content obstacle-modal-content">
+      <h2 id="obstacle-title">Obstacle</h2>
+      <p id="obstacle-instructions">Match the pairs to pass this obstacle. Too many wrongs and you'll fail.</p>
+      <p id="obstacle-status">Matches: <span id="matched-count">0</span> / <span id="matched-target">0</span> &nbsp; Wrong: <span id="wrong-count">0</span></p>
+      <div id="obstacle-cards" class="cards-grid"></div>
+      <div class="obstacle-controls">
+        <button id="obstacle-retry">Retry</button>
+        <button id="obstacle-giveup">Give Up</button>
+      </div>
+    </div>
+  </div>
   <footer>
-    <p>&copy; 2025 Your Name. All rights reserved.</p>
+    <p>&copy; 2025 Maelona Garth. All rights reserved.</p>
   </footer>
   <script src="javascript.js"></script>
 </body>

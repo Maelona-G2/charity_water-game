@@ -1,6 +1,3 @@
-
-
-
 // --- UI Logic for Username, Greeting, and Game Visibility ---
 document.addEventListener('DOMContentLoaded', () => {
   // Username form logic
@@ -19,10 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let timeElapsed = 0;
   let started = false;
   let checkpointsReached = 0;
-  let checkpointTiles = [ [5,7], [8,6], [13,6] ]; // Example checkpoint tiles (col,row)
+  // Tiles are stored as [row, col]
+  let checkpointTiles = [ [5,7], [8,6], [16,7] ]; // Example checkpoint tiles (row,col)
 
   function resetGameState() {
-    playerPos = { col: 1, row: 5 };
+    // playerPos uses { row, col }
+    playerPos = { row: 5, col: 1 };
     timeElapsed = 0;
     started = false;
     checkpointsReached = 0;
@@ -135,27 +134,262 @@ function startGame() {
   // Match the CSS grid: 16 columns x 9 rows (tiles are 1-based indices in path data)
   const boardCols = 16;
   const boardRows = 9;
-  const pathTiles = [
-    [1,5],[1,6],[1,7],[1,8],[1,9],[2,9],[3,9],[3,8],[3,7],[3,6],[3,5],[4,5],[5,5],[5,6],[5,7],[6,6],[6,7],[6,8],[7,8],[8,8],[8,7],[8,6],[8,5],[8,4],[9,4],[10,4],[10,5],[10,6],[10,7],[10,8],[10,9],[11,9],[12,9],[12,8],[12,7],[12,6],[13,6],[14,6],[14,7],[14,8],[14,9],[15,9],[16,9],[16,8],[16,7],[16,6]
+  let pathTiles = [
+  [1,4],[1,5],[1,6],[1,7],[1,8],[2,8],[3,8],[3,7],[3,6],[3,4],[4,4],[5,4],[5,5],[6,5],[6,6],[6,7],[7,7],[8,7],[8,6],[8,5],[8,4],[8,3],[9,3],[10,3],[10,4],[10,5],[10,6],[10,7],[10,8],[11,8],[12,8],[12,7],[12,6],[12,5],[13,5],[14,5],[14,6],[14,7],[15,7],[16,7],[16,6],[16,5],[16,4]
   ];
+  // Data was originally stored as [col,row] — convert to [row,col]
+  pathTiles = pathTiles.map(([a,b]) => [b,a]);
   const obstacles = {
-    stick: [4,5],
-    tiger: [10,5],
-    third: [16,7]
+    // coordinates are [row, col]
+    // original user positions were given as [col,row] (4,5), (10,5), (16,7)
+    // converted to [row,col] they become [5,4], [5,10], [7,16]
+    stick: [5,4],
+    tiger: [5,10],
+    third: [7,16]
   };
-  const endTile = [16,6];
-  let playerPos = { col: 1, row: 5 };
+  // obstacle configuration for matching game: pairs target and allowed wrongs
+  const obstacleConfig = {
+    stick: { pairs: 3, // 3 pairs -> 6 cards
+             wrongsAllowed: 1,
+             name: 'Stick' },
+    tiger: { pairs: 4, // 4 pairs -> 8 cards
+             wrongsAllowed: 2,
+             name: 'Tiger' },
+    third: { pairs: 6, // 6 pairs -> 12 cards
+             wrongsAllowed: 3,
+             name: 'Third Obstacle' }
+  };
+  // track if obstacle cleared
+  const obstacleState = {
+    stick: { cleared: false },
+    tiger: { cleared: false },
+    third: { cleared: false }
+  };
 
-  function isPathTile(col, row) {
-    return pathTiles.some(([c, r]) => c === col && r === row);
+  // color palette for card variants (index -> color class)
+  const cardColors = [
+    'yellow','blue','purple','red','pink','orange','green','white','black','gray','teal','brown'
+  ];
+
+  // modal elements
+  const obstacleModal = document.getElementById('obstacle-modal');
+  const obstacleTitle = document.getElementById('obstacle-title');
+  const obstacleInstructions = document.getElementById('obstacle-instructions');
+  const obstacleCards = document.getElementById('obstacle-cards');
+  const matchedCountEl = document.getElementById('matched-count');
+  const matchedTargetEl = document.getElementById('matched-target');
+  const wrongCountEl = document.getElementById('wrong-count');
+  const obstacleRetry = document.getElementById('obstacle-retry');
+  const obstacleGiveUp = document.getElementById('obstacle-giveup');
+
+  let currentObstacle = null;
+  let deck = [];
+  let revealed = []; // indices of currently revealed cards
+  let matched = new Set();
+  let wrongs = 0;
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
   }
-  function isObstacle(col, row) {
+
+  function buildDeck(pairs) {
+    // build 'pairs' pairs of colored jerrycan cards
+    const cards = [];
+    for (let i = 0; i < pairs; i++) {
+      const color = cardColors[i % cardColors.length];
+      // two copies for a pair
+      cards.push({ id: i, color });
+      cards.push({ id: i, color });
+    }
+    shuffle(cards);
+    return cards;
+  }
+
+  function openObstacleModal(key, prevPos) {
+    currentObstacle = { key, prevPos };
+    const cfg = obstacleConfig[key];
+    if (!cfg) return;
+    matched.clear();
+    revealed = [];
+    wrongs = 0;
+    deck = buildDeck(cfg.pairs);
+    // render modal
+    if (obstacleTitle) obstacleTitle.textContent = `Obstacle: ${cfg.name}`;
+    if (matchedCountEl) matchedCountEl.textContent = '0';
+    if (matchedTargetEl) matchedTargetEl.textContent = String(cfg.pairs);
+    if (wrongCountEl) wrongCountEl.textContent = '0';
+    if (obstacleCards) {
+      obstacleCards.innerHTML = '';
+      deck.forEach((card, idx) => {
+        const d = document.createElement('div');
+        d.className = 'card';
+        d.dataset.index = idx;
+
+        // inner container
+        const inner = document.createElement('div');
+        inner.className = 'card-inner';
+
+        // back face (face-down)
+        const back = document.createElement('div');
+        back.className = 'card-face card-back';
+        back.textContent = '';
+
+        // front face (revealed) - jerrycan image
+        const front = document.createElement('div');
+        front.className = 'card-face card-front';
+        front.style.backgroundColor = card.color || 'yellow';
+        const img = document.createElement('img');
+        img.src = 'img/jerrycan.png';
+        img.alt = 'card';
+        front.appendChild(img);
+
+        inner.appendChild(back);
+        inner.appendChild(front);
+        d.appendChild(inner);
+
+        d.addEventListener('click', () => handleCardClick(idx));
+        obstacleCards.appendChild(d);
+      });
+    }
+    // show modal
+    if (obstacleModal) obstacleModal.style.display = 'flex';
+  }
+
+  function closeObstacleModal() {
+    if (obstacleModal) obstacleModal.style.display = 'none';
+    currentObstacle = null;
+    deck = [];
+    revealed = [];
+    matched.clear();
+  }
+
+  function handleCardClick(index) {
+    if (matched.has(index)) return;
+    if (revealed.includes(index)) return;
+    revealed.push(index);
+    const cardEl = obstacleCards.querySelector(`.card[data-index="${index}"]`);
+    if (cardEl) cardEl.classList.add('flipped');
+    if (revealed.length === 2) {
+      // check match
+      const [a, b] = revealed;
+      tryMatch(a, b);
+    }
+  }
+
+  function tryMatch(aIdx, bIdx) {
+    const a = deck[aIdx];
+    const b = deck[bIdx];
+    if (!a || !b) return;
+    if (a.id === b.id) {
+      // matched
+      matched.add(aIdx);
+      matched.add(bIdx);
+      matchedCountEl.textContent = String(matched.size / 2);
+      // keep them flipped and disabled
+      [aIdx, bIdx].forEach(i => {
+        const el = obstacleCards.querySelector(`.card[data-index="${i}"]`);
+        if (el) el.classList.add('disabled');
+      });
+      revealed = [];
+      // success condition
+      const cfg = obstacleConfig[currentObstacle.key];
+      if ((matched.size / 2) >= cfg.pairs) {
+        // cleared
+        obstacleState[currentObstacle.key].cleared = true;
+        closeObstacleModal();
+      }
+    } else {
+      // wrong
+      wrongs++;
+      wrongCountEl.textContent = String(wrongs);
+      // flip back after short delay
+      setTimeout(() => {
+        // re-enable the two cards
+        revealed.forEach(idx => {
+          const el = obstacleCards.querySelector(`.card[data-index="${idx}"]`);
+          if (el) {
+            el.classList.remove('flipped');
+            el.classList.remove('disabled');
+          }
+        });
+        revealed = [];
+      }, 600);
+      const cfg = obstacleConfig[currentObstacle.key];
+      if (wrongs > cfg.wrongsAllowed) {
+        // failure -> move player back to previous tile and close modal
+        const prev = currentObstacle.prevPos;
+        playerPos = prev;
+        renderPlayer();
+        closeObstacleModal();
+      }
+    }
+  }
+
+  if (obstacleRetry) obstacleRetry.addEventListener('click', () => {
+    // rebuild deck and reset counts
+    if (!currentObstacle) return;
+    const cfg = obstacleConfig[currentObstacle.key];
+    deck = buildDeck(cfg.pairs);
+    matched.clear();
+    revealed = [];
+    wrongs = 0;
+    matchedCountEl.textContent = '0';
+    wrongCountEl.textContent = '0';
+    // re-render cards
+    if (obstacleCards) {
+      obstacleCards.innerHTML = '';
+      deck.forEach((card, idx) => {
+        const d = document.createElement('div');
+        d.className = 'card';
+        d.dataset.index = idx;
+        const img = document.createElement('img');
+        img.src = 'img/jerrycan.png';
+        img.alt = 'card';
+        d.style.backgroundColor = card.color || 'yellow';
+        d.appendChild(img);
+        d.addEventListener('click', () => handleCardClick(idx));
+        obstacleCards.appendChild(d);
+      });
+    }
+  });
+
+  if (obstacleGiveUp) obstacleGiveUp.addEventListener('click', () => {
+    // give up: send player back to previous tile and close
+    if (!currentObstacle) return;
+    const prev = currentObstacle.prevPos;
+    playerPos = prev;
+    renderPlayer();
+    closeObstacleModal();
+  });
+  const endTile = [5,16]; // [row, col] (swapped from original)
+  // playerPos uses { row, col }
+  let playerPos = { row: 5, col: 1 };
+
+  // note: arrays are [row, col]
+  function isPathTile(row, col) {
+    return pathTiles.some(([r, c]) => r === row && c === col);
+  }
+  function isObstacle(row, col) {
     // obstacles are now passable; keep the function for future use (e.g., penalties)
-    return Object.values(obstacles).some(([c, r]) => c === col && r === row);
+    return Object.values(obstacles).some(([r, c]) => r === row && c === col);
   }
-  function isCheckpoint(col, row) {
-    return checkpointTiles.some(([c, r]) => c === col && r === row);
+  // find obstacle key by position (row,col)
+  function obstacleKeyAt(row, col) {
+    for (const k of Object.keys(obstacles)) {
+      const [r, c] = obstacles[k];
+      if (r === row && c === col) return k;
+    }
+    return null;
   }
+  function isCheckpoint(row, col) {
+    return checkpointTiles.some(([r, c]) => r === row && c === col);
+  }
+
+  // Movement configuration: set to false to allow full free movement across the board
+  let restrictToPath = false;
 
   function renderPlayer() {
     const playerDiv = document.getElementById('player');
@@ -201,18 +435,25 @@ function startGame() {
   }
 
   function movePlayer(dir) {
-    let { col, row } = playerPos;
+    let { row, col } = playerPos;
     if (dir === 'ArrowUp') row--;
     if (dir === 'ArrowDown') row++;
     if (dir === 'ArrowLeft') col--;
     if (dir === 'ArrowRight') col++;
-    if (row < 0 || row >= boardRows || col < 0 || col >= boardCols) return;
-    // only allow movement along defined path tiles
-    if (!isPathTile(col, row)) return;
-    // obstacles are passable now; keep detection for optional effects
-    if (isObstacle(col, row)) {
-      console.log('stepped on obstacle at', col, row);
-      // could add penalty/animation here
+  // board uses 1-based tile indices: rows 1..boardRows, cols 1..boardCols
+  if (row < 1 || row > boardRows || col < 1 || col > boardCols) return;
+  // optionally restrict movement to defined path tiles
+  if (restrictToPath && !isPathTile(row, col)) return;
+    // obstacles are passable now; but trigger obstacle modal if present and not yet cleared
+    const key = obstacleKeyAt(row, col);
+    if (key && !obstacleState[key].cleared) {
+      // move into tile visually then open modal for matching game
+      const prevPos = { ...playerPos };
+      playerPos = { row, col };
+      renderPlayer();
+      console.log('trigger obstacle', key);
+      openObstacleModal(key, prevPos);
+      return;
     }
     // Start timer on first move
     if (!started) {
@@ -220,7 +461,7 @@ function startGame() {
       startTimer();
     }
     // Checkpoint logic
-    if (isCheckpoint(col, row)) {
+    if (isCheckpoint(row, col)) {
       // Only count if not already reached
       if (checkpointsReached < checkpointTiles.length &&
           (col !== playerPos.col || row !== playerPos.row)) {
@@ -229,9 +470,9 @@ function startGame() {
         if (levelDisplay) levelDisplay.textContent = String(checkpointsReached+1);
       }
     }
-    playerPos = { col, row };
+    playerPos = { row, col };
     renderPlayer();
-    if (col === endTile[0] && row === endTile[1]) {
+    if (row === endTile[0] && col === endTile[1]) {
       setTimeout(() => alert('You reached the pond!'), 100);
       if (timer) clearInterval(timer);
     }
